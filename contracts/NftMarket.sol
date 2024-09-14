@@ -4,6 +4,7 @@ pragma solidity >=0.4.22 <0.9.0;
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/math/Math.sol";
 
 contract NftMarket is ERC721URIStorage, Ownable {
     using Counters for Counters.Counter;
@@ -190,6 +191,22 @@ contract NftMarket is ERC721URIStorage, Ownable {
         _listedItems.increment();
     }
 
+    // 下市
+    function cancelNftOnSale(uint tokenId) public payable {
+        require(
+            ownerOf(tokenId) == msg.sender,
+            "You are not owner of this nft"
+        );
+        require(_idToNftItem[tokenId].isListed == true, "Item is not on sale");
+
+        // 计算退还金额的80%
+        uint refundAmount = (listingPrice * 80) / 100;
+        payable(msg.sender).transfer(refundAmount);
+        _idToNftItem[tokenId].isListed = false;
+        _idToNftItem[tokenId].price = 0;
+        _listedItems.decrement();
+    }
+
     // 创造一个nftItem
     function _nftItemCreate(uint tokenId, uint price) private {
         require(price > 0, "Price must be at least 1 wei");
@@ -197,6 +214,7 @@ contract NftMarket is ERC721URIStorage, Ownable {
         emit NftItemCreated(tokenId, price, msg.sender, true);
     }
 
+    // mint tranfer burn 前置行为
     function _beforeTokenTransfer(
         address from,
         address to,

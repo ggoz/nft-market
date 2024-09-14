@@ -7,6 +7,7 @@ import useSWR from "swr";
 
 type UseOwnedNftsResponse = {
   listNft: (tokenId: number, price: number) => Promise<void>;
+  unlistNft: (tokenId: number) => Promise<void>;
 };
 type OwnedNftsHookFactory = CryptoHookFactory<Nft[], UseOwnedNftsResponse>;
 
@@ -57,9 +58,27 @@ export const hookFactory: OwnedNftsHookFactory =
       [_contract]
     );
 
+    const unlistNft = useCallback(
+      async (tokenId: number) => {
+        try {
+          const result = await _contract!.cancelNftOnSale(tokenId);
+
+          await toast.promise(result!.wait(), {
+            pending: "Unlist nft",
+            success: "Unlist nft success",
+            error: "Unlist nft error"
+          });
+        } catch (e: any) {
+          console.error(e.message);
+        }
+      },
+      [_contract]
+    );
+
     return {
       ...swr,
       listNft,
+      unlistNft,
       data: data || []
     };
   };

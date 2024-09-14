@@ -63,7 +63,7 @@ const Web3Provider: FunctionComponent<PropsWithChildren> = ({ children }) => {
     return () => removeGlobalListeners(window.ethereum);
   }, []);
 
-  return <Web3Context.Provider value={web3Api}>{children}</Web3Context.Provider>;
+  return <Web3Context.Provider value={ web3Api }>{ children }</Web3Context.Provider>;
 };
 
 export function useWeb3() {

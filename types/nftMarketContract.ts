@@ -57,16 +57,12 @@ export interface ContractCallOverrides {
 export type NftMarketContractEvents =
   | 'Approval'
   | 'ApprovalForAll'
-  | 'BatchMetadataUpdate'
-  | 'MetadataUpdate'
   | 'NftItemCreated'
   | 'OwnershipTransferred'
   | 'Transfer';
 export interface NftMarketContractEventsContext {
   Approval(...parameters: any): EventFilter;
   ApprovalForAll(...parameters: any): EventFilter;
-  BatchMetadataUpdate(...parameters: any): EventFilter;
-  MetadataUpdate(...parameters: any): EventFilter;
   NftItemCreated(...parameters: any): EventFilter;
   OwnershipTransferred(...parameters: any): EventFilter;
   Transfer(...parameters: any): EventFilter;
@@ -102,7 +98,8 @@ export type NftMarketContractMethodNames =
   | 'tokenURIExists'
   | 'burnToken'
   | 'mintToken'
-  | 'placeNftOnSale';
+  | 'placeNftOnSale'
+  | 'cancelNftOnSale';
 export interface ApprovalEventEmittedResponse {
   owner: string;
   approved: string;
@@ -112,13 +109,6 @@ export interface ApprovalForAllEventEmittedResponse {
   owner: string;
   operator: string;
   approved: boolean;
-}
-export interface BatchMetadataUpdateEventEmittedResponse {
-  _fromTokenId: BigNumberish;
-  _toTokenId: BigNumberish;
-}
-export interface MetadataUpdateEventEmittedResponse {
-  _tokenId: BigNumberish;
 }
 export interface NftItemCreatedEventEmittedResponse {
   tokenId: BigNumberish;
@@ -265,13 +255,13 @@ export interface NftMarketContract {
    * @param from Type: address, Indexed: false
    * @param to Type: address, Indexed: false
    * @param tokenId Type: uint256, Indexed: false
-   * @param data Type: bytes, Indexed: false
+   * @param _data Type: bytes, Indexed: false
    */
   safeTransferFrom(
     from: string,
     to: string,
     tokenId: BigNumberish,
-    data: Arrayish,
+    _data: Arrayish,
     overrides?: ContractTransactionOverrides
   ): Promise<ContractTransaction>;
   /**
@@ -475,6 +465,17 @@ export interface NftMarketContract {
   placeNftOnSale(
     tokenId: BigNumberish,
     newPrice: BigNumberish,
+    overrides?: ContractTransactionOverrides
+  ): Promise<ContractTransaction>;
+  /**
+   * Payable: true
+   * Constant: false
+   * StateMutability: payable
+   * Type: function
+   * @param tokenId Type: uint256, Indexed: false
+   */
+  cancelNftOnSale(
+    tokenId: BigNumberish,
     overrides?: ContractTransactionOverrides
   ): Promise<ContractTransaction>;
 }
